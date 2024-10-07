@@ -46,12 +46,13 @@ public struct Waveform: NSViewRepresentable {
 
     /// Required by NSViewRepresentable
     public func makeNSView(context: Context) -> some NSView {
-        let metalView = MTKView(frame: CGRect(x: 0, y: 0, width: 1024, height: 768),
+        let metalView = MTKView(frame: .zero,
                                 device: MTLCreateSystemDefaultDevice()!)
         metalView.enableSetNeedsDisplay = true
         metalView.isPaused = true
         metalView.delegate = context.coordinator.renderer
         metalView.layer?.isOpaque = false
+        metalView.autoResizeDrawable = false
         return metalView
     }
 
@@ -60,7 +61,9 @@ public struct Waveform: NSViewRepresentable {
         let renderer = context.coordinator.renderer
         renderer.constants = constants
         renderer.set(samples: samples, start: start, length: length)
-        nsView.setNeedsDisplay(nsView.bounds)
+        Task { @MainActor in
+            uiView.setNeedsDisplay()
+        }
     }
 }
 #else
@@ -103,12 +106,13 @@ public struct Waveform: UIViewRepresentable {
 
     /// Required by UIViewRepresentable
     public func makeUIView(context: Context) -> some UIView {
-        let metalView = MTKView(frame: CGRect(x: 0, y: 0, width: 1024, height: 768),
+        let metalView = MTKView(frame: .zero,
                                 device: MTLCreateSystemDefaultDevice()!)
         metalView.enableSetNeedsDisplay = true
         metalView.isPaused = true
         metalView.delegate = context.coordinator.renderer
         metalView.layer.isOpaque = false
+        metalView.autoResizeDrawable = false
         return metalView
     }
 
@@ -117,7 +121,9 @@ public struct Waveform: UIViewRepresentable {
         let renderer = context.coordinator.renderer
         renderer.constants = constants
         renderer.set(samples: samples, start: start, length: length)
-        uiView.setNeedsDisplay()
+        Task { @MainActor in
+            uiView.setNeedsDisplay()
+        }
     }
 }
 #endif
