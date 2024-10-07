@@ -61,9 +61,6 @@ public struct Waveform: NSViewRepresentable {
         let renderer = context.coordinator.renderer
         renderer.constants = constants
         renderer.set(samples: samples, start: start, length: length)
-        Task { @MainActor in
-            uiView.setNeedsDisplay()
-        }
     }
 }
 #else
@@ -121,9 +118,6 @@ public struct Waveform: UIViewRepresentable {
         let renderer = context.coordinator.renderer
         renderer.constants = constants
         renderer.set(samples: samples, start: start, length: length)
-        Task { @MainActor in
-            uiView.setNeedsDisplay()
-        }
     }
 }
 #endif
